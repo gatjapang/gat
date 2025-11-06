@@ -440,9 +440,6 @@
   </footer>
 
   <script>
-   
-  // ★ここにGASのWebアプリURLを貼る
-  const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwt6WMQG60tDRCtEbFv-ldIeoxS8YhH7jVmZQJY2fONTiwAbtWdlM2BvLIolGWnXNys7Q/exec';
 
     /* =========================
        簡易ニュース（ダミーデータ）
@@ -470,6 +467,10 @@
     }
     renderNews(shown);
     moreBtn.addEventListener('click', () => { shown = Math.min(news.length, shown + 3); renderNews(shown); });
+
+       
+  // ★ここにGASのWebアプリURLを貼る
+  const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwt6WMQG60tDRCtEbFv-ldIeoxS8YhH7jVmZQJY2fONTiwAbtWdlM2BvLIolGWnXNys7Q/exec';
 
     // フォーム送信（本番版：GASにPOSTしてスプレッドシート＋メール通知）
     function handleSubmit(e){
@@ -534,6 +535,7 @@
   </script>
 </body>
 </html>
+
 
 
 
