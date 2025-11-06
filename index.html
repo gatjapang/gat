@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta name="google-site-verification" content="7rvvjEznD2UmfoN6rJcgRQAOckQ63odjL5_bZfC7k_A" />
   <meta charset="utf-8" />
-
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ガッツ合同会社 GAT LLC｜営業代行・WEB制作・パーソナルトレーニング</title>
   <meta name="description" content="ガッツ合同会社（GAT LLC）の公式サイト。営業代行・WEB制作・パーソナルトレーニング" />
@@ -26,7 +24,7 @@
   <meta name="twitter:title" content="ガッツ合同会社（GAT LLC）｜鹿児島の営業代行・WEB制作・パーソナルトレーニング" />
   <meta name="twitter:description" content="営業代行・WEBページ作成・パーソナルトレーニングなど、鹿児島市拠点で暮らしとビジネスをサポートするガッツ合同会社（GAT LLC）の公式サイトです。" />
   <meta name="twitter:image" content="https://gatjapang.github.io/gat/assets/hero.jpg" />
-
+  
   <!-- 構造化データ（会社情報を機械に伝える） -->
   <script type="application/ld+json">
   {
@@ -157,6 +155,35 @@
        ========================= */
     .recruit-tiles { display: grid; gap: 16px; }
     @media (min-width: 820px) { .recruit-tiles { grid-template-columns: repeat(3, 1fr); } }
+
+  /* =========================
+     Recruitセクション用カスタム表示
+     ========================= */
+  #recruit .recruit-tiles {
+    display: flex;                 /* 横並びの基礎設定 */
+    justify-content: center;       /* 中央寄せ */
+  }
+
+  #recruit .card {
+    width: 80vw;                   /* 画面幅の50%（横幅の半分） */
+    max-width: 600px;              /* 大画面でも大きくなりすぎないよう制限 */
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  }
+
+  #recruit .card img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  /* スマホでは全幅（100%）に戻す */
+  @media (max-width: 768px) {
+    #recruit .card {
+      width: 90vw;
+    }
+  }
 
     /* =========================
        お問い合わせ
@@ -388,9 +415,7 @@
             <p id="formResult" class="lead" aria-live="polite" style="display:none"></p>
           </form>
         </div>
-        <div>
-          <img src="assets/contact.jpg" alt="お問い合わせイメージ" />
-        </div>
+        
       </div>
     </div>
   </section>
@@ -406,6 +431,10 @@
   </footer>
 
   <script>
+   
+  // ★ここにGASのWebアプリURLを貼る
+  const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwt6WMQG60tDRCtEbFv-ldIeoxS8YhH7jVmZQJY2fONTiwAbtWdlM2BvLIolGWnXNys7Q/exec';
+
     /* =========================
        簡易ニュース（ダミーデータ）
        実運用ではCMSやGAS/Sheets/API連携で差し替え可能です。
@@ -433,26 +462,67 @@
     renderNews(shown);
     moreBtn.addEventListener('click', () => { shown = Math.min(news.length, shown + 3); renderNews(shown); });
 
-    // フォーム送信（デモ）。実運用は fetch でGASやバックエンドにPOSTしてください。
+    // フォーム送信（本番版：GASにPOSTしてスプレッドシート＋メール通知）
     function handleSubmit(e){
       e.preventDefault();
-      const fd = new FormData(e.currentTarget);
+      const form = e.currentTarget;
+      const fd = new FormData(form);
       const obj = Object.fromEntries(fd.entries());
-      // デモ：バリデーション例
-      if(!obj.name || !obj.email || !obj.message){ alert('未入力の項目があります'); return false; }
-      document.getElementById('formResult').style.display = 'block';
-      document.getElementById('formResult').textContent = '送信が完了しました（デモ）';
-      e.currentTarget.reset();
+
+      // 簡易バリデーション
+      if(!obj.name || !obj.email || !obj.message){
+        alert('未入力の項目があります');
+        return false;
+      }
+
+      const resultEl = document.getElementById('formResult');
+      resultEl.style.display = 'block';
+      resultEl.textContent = '送信中です…';
+
+      // GASに送るデータを整形
+      const payload = {
+        name: obj.name,
+        email: obj.email,
+        topic: obj.topic || '',
+        message: obj.message,
+        userAgent: navigator.userAgent
+      };
+
+      fetch(GAS_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(function(res){
+        // JSONとして解釈を試みる
+        return res.json().catch(function(){
+          // もしJSONで返らなかった場合も一応成功扱いにする
+          return { result: 'success' };
+        });
+      })
+      .then(function(data){
+        if(data.result === 'success'){
+          resultEl.textContent = '送信が完了しました。ありがとうございました。';
+          form.reset();
+        } else {
+          console.error('GAS error:', data);
+          resultEl.textContent = '送信に失敗しました。時間をおいて再度お試しください。';
+        }
+      })
+      .catch(function(err){
+        console.error(err);
+        resultEl.textContent = '送信に失敗しました。通信環境をご確認のうえ、時間をおいて再度お試しください。';
+      });
+
       return false;
     }
+
 
     // コピーライト年
     document.getElementById('copyYear').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
-
-
-
-
 
