@@ -391,7 +391,12 @@
       </div>
       <div class="two">
         <div>
-          <form id="contactForm" onsubmit="return handleSubmit(event)">
+          <form
+  id="contactForm"
+  action="https://script.google.com/macros/s/AKfycbxuxtO0k-KjNtdGnoAyMXMDCp5gHr8NB7wIusB0NKTtgyloVINWt57txUqwGb-OLFtOUA/exec"
+  method="POST"
+>
+
             <!-- お名前 -->
             <div class="field">
               <label for="name">お名前</label>
@@ -473,7 +478,7 @@
   });
 
 
-  // ★ここにGASのWebアプリURLを貼る（最新デプロイのURL）
+  // ★ここにGASのWebアプリURLを貼る（最新デプロイのURL）/*
   const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxuxtO0k-KjNtdGnoAyMXMDCp5gHr8NB7wIusB0NKTtgyloVINWt57txUqwGb-OLFtOUA/exec';
 
 // フォーム送信（GASにFormDataをPOST）
@@ -517,9 +522,10 @@ function handleSubmit(e){
 
   return false;
 }
-
+*/
   // コピーライト年
   document.getElementById('copyYear').textContent = new Date().getFullYear();
 </script>
+
 
 
