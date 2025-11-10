@@ -441,7 +441,7 @@
 
 <script>
   /* =========================
-     簡易ニュース（ダミーデータ）
+     簡易ニュース
      ========================= */
   const news = [
     { date: '2025-10-31', title: 'サイトを公開しました。', url: '#' },
@@ -474,76 +474,54 @@
 
 
   // ★ここにGASのWebアプリURLを貼る（最新デプロイのURL）
-  const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzKiQF9QU_XTJXczjWrt-ruKbbBXqmjFSF5XwftMU7JXecnA-FUzKYHbY5NNgMybXIIDA/exec';
+  const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxuxtO0k-KjNtdGnoAyMXMDCp5gHr8NB7wIusB0NKTtgyloVINWt57txUqwGb-OLFtOUA/exec';
 
-  // フォーム送信処理（GASへJSONをPOST）
-  function handleSubmit(e){
-    e.preventDefault();
+ // ★ここにGASのWebアプリURLを貼る（最新デプロイのURL）
+const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzKiQF9QU_XTJXczjWrt-ruKbbBXqmjFSF5XwftMU7JXecnA-FUzKYHbY5NNgMybXIIDA/exec';
 
-    const form = e.currentTarget;
-    const fd   = new FormData(form);
-    const obj  = Object.fromEntries(fd.entries());
+// フォーム送信（GASにFormDataをPOST）
+function handleSubmit(e){
+  e.preventDefault();
 
-    // 必須項目チェック
-    if (!obj.name || !obj.email || !obj.message) {
-      alert('未入力の項目があります');
-      return false;
-    }
+  const form = e.currentTarget;
+  const fd   = new FormData(form);
 
-    const resultEl = document.getElementById('formResult');
-    resultEl.style.display = 'block';
-    resultEl.textContent = '送信中です…';
+  // userAgent も一緒に送る
+  fd.append('userAgent', navigator.userAgent);
 
-    // GASに送るデータ
-    const payload = {
-      name: obj.name,
-      email: obj.email,
-      topic: obj.topic || '',
-      message: obj.message,
-      userAgent: navigator.userAgent
-    };
-
-    // デバッグ用ログ
-    console.log('送信データ:', payload);
-
-    fetch(GAS_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    })
-    .then(function(res){
-      console.log('HTTPステータス:', res.status);
-      // ステータスが200番台以外ならエラー扱い
-      if (!res.ok) {
-        throw new Error('HTTPエラー: ' + res.status);
-      }
-      return res.json().catch(function(){
-        // JSONで返ってこなかった場合も、一応成功扱いにする
-        return { result: 'success' };
-      });
-    })
-    .then(function(data){
-      console.log('GASレスポンス:', data);
-
-      if (data.result === 'success') {
-        resultEl.textContent = '送信が完了しました。ありがとうございました。';
-        form.reset();
-      } else {
-        // GAS側からエラー返却された場合
-        resultEl.textContent = '送信に失敗しました：' + (data.message || '時間をおいて再度お試しください。');
-        console.error('GAS error:', data);
-      }
-    })
-    .catch(function(err){
-      console.error('通信エラー:', err);
-      resultEl.textContent = '送信に失敗しました（通信エラー）。時間をおいて再度お試しください。';
-    });
-
+  // 必須項目チェック（表示用）
+  if (!fd.get('name') || !fd.get('email') || !fd.get('message')) {
+    alert('未入力の項目があります');
     return false;
   }
+
+  const resultEl = document.getElementById('formResult');
+  resultEl.style.display = 'block';
+  resultEl.textContent = '送信中です…';
+
+  // デバッグ用ログ（名前とメールだけにしておく）
+  console.log('送信データ(名前・メール):', fd.get('name'), fd.get('email'));
+
+  fetch(GAS_ENDPOINT, {
+    method: 'POST',
+    mode: 'no-cors',   // ← これがポイント（CORSエラーを回避）
+    body: fd           // ← FormDataをそのまま送る（ヘッダーは自動で付く）
+  })
+  .then(function(){
+    // no-cors なのでレスポンスの中身は読めないが、
+    // ここまで来れば「リクエスト送信自体」は成功したとみなせる
+    resultEl.textContent = '送信が完了しました。ありがとうございました。';
+    form.reset();
+  })
+  .catch(function(err){
+    console.error('通信エラー:', err);
+    resultEl.textContent = '送信に失敗しました。通信環境をご確認のうえ、時間をおいて再度お試しください。';
+  });
+
+  return false;
+}
 
   // コピーライト年
   document.getElementById('copyYear').textContent = new Date().getFullYear();
 </script>
+
