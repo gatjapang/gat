@@ -439,108 +439,111 @@
     </div>
   </footer>
 
-  <script>
+<script>
+  /* =========================
+     簡易ニュース（ダミーデータ）
+     ========================= */
+  const news = [
+    { date: '2025-10-31', title: 'サイトを公開しました。', url: '#' },
+    { date: '2025-09-15', title: 'トレーニングメニューを更新しました。', url: '#' },
+    { date: '2025-09-05', title: '取引先の研修に帯同しました。', url: '#' },
+    { date: '2025-07-10', title: '夏季休業のお知らせ8/10～8/17休業', url: '#' },
+  ];
 
-    /* =========================
-       簡易ニュース（ダミーデータ）
-       実運用ではCMSやGAS/Sheets/API連携で差し替え可能です。
-       ========================= */
-    const news = [
-      { date: '2025-10-31', title: 'サイトを公開しました。', url: '#' },
-      { date: '2025-09-15', title: 'トレーニングメニューを更新しました。', url: '#' },
-      { date: '2025-09-05', title: '取引先の研修に帯同しました。', url: '#' },
-      { date: '2025-07-10', title: '夏季休業のお知らせ8/10～8/17休業', url: '#' },
-    ];
-    const list = document.getElementById('newsList');
-    const moreBtn = document.getElementById('moreNews');
-    let shown = 3;
+  const list = document.getElementById('newsList');
+  const moreBtn = document.getElementById('moreNews');
+  let shown = 3;
 
-    function renderNews(n){
-      list.innerHTML = '';
-      news.slice(0, n).forEach(it => {
-        const el = document.createElement('a');
-        el.href = it.url;
-        el.className = 'news-item';
-        el.innerHTML = `<time datetime="${it.date}">${it.date}</time><div>${it.title}</div>`;
-        list.appendChild(el);
-      });
-    }
+  function renderNews(n){
+    list.innerHTML = '';
+    news.slice(0, n).forEach(it => {
+      const el = document.createElement('a');
+      el.href = it.url;
+      el.className = 'news-item';
+      el.innerHTML = `<time datetime="${it.date}">${it.date}</time><div>${it.title}</div>`;
+      list.appendChild(el);
+    });
+  }
+
+  renderNews(shown);
+
+  moreBtn.addEventListener('click', () => {
+    shown = Math.min(news.length, shown + 3);
     renderNews(shown);
-    moreBtn.addEventListener('click', () => { shown = Math.min(news.length, shown + 3); renderNews(shown); });
+  });
 
-       
-  // ★ここにGASのWebアプリURLを貼る
+
+  // ★ここにGASのWebアプリURLを貼る（最新デプロイのURL）
   const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzKiQF9QU_XTJXczjWrt-ruKbbBXqmjFSF5XwftMU7JXecnA-FUzKYHbY5NNgMybXIIDA/exec';
 
-    // フォーム送信（本番版：GASにPOSTしてスプレッドシート＋メール通知）
-    function handleSubmit(e){
-      e.preventDefault();
-      const form = e.currentTarget;
-      const fd = new FormData(form);
-      const obj = Object.fromEntries(fd.entries());
+  // フォーム送信処理（GASへJSONをPOST）
+  function handleSubmit(e){
+    e.preventDefault();
 
-      // 簡易バリデーション
-      if(!obj.name || !obj.email || !obj.message){
-        alert('未入力の項目があります');
-        return false;
-      }
+    const form = e.currentTarget;
+    const fd   = new FormData(form);
+    const obj  = Object.fromEntries(fd.entries());
 
-      const resultEl = document.getElementById('formResult');
-      resultEl.style.display = 'block';
-      resultEl.textContent = '送信中です…';
-
-      // GASに送るデータを整形
-      const payload = {
-        name: obj.name,
-        email: obj.email,
-        topic: obj.topic || '',
-        message: obj.message,
-        userAgent: navigator.userAgent
-      };
-
-      fetch(GAS_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      })
-      .then(function(res){
-        // JSONとして解釈を試みる
-        return res.json().catch(function(){
-          // もしJSONで返らなかった場合も一応成功扱いにする
-          return { result: 'success' };
-        });
-      })
-      .then(function(data){
-        if(data.result === 'success'){
-          resultEl.textContent = '送信が完了しました。ありがとうございました。';
-          form.reset();
-        } else {
-          console.error('GAS error:', data);
-          resultEl.textContent = '送信に失敗しました。時間をおいて再度お試しください。';
-        }
-      })
-      .catch(function(err){
-        console.error(err);
-        resultEl.textContent = '送信に失敗しました。通信環境をご確認のうえ、時間をおいて再度お試しください。';
-      });
-
+    // 必須項目チェック
+    if (!obj.name || !obj.email || !obj.message) {
+      alert('未入力の項目があります');
       return false;
     }
 
+    const resultEl = document.getElementById('formResult');
+    resultEl.style.display = 'block';
+    resultEl.textContent = '送信中です…';
 
-    // コピーライト年
-    document.getElementById('copyYear').textContent = new Date().getFullYear();
-  </script>
-</body>
-</html>
+    // GASに送るデータ
+    const payload = {
+      name: obj.name,
+      email: obj.email,
+      topic: obj.topic || '',
+      message: obj.message,
+      userAgent: navigator.userAgent
+    };
 
+    // デバッグ用ログ
+    console.log('送信データ:', payload);
 
+    fetch(GAS_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(function(res){
+      console.log('HTTPステータス:', res.status);
+      // ステータスが200番台以外ならエラー扱い
+      if (!res.ok) {
+        throw new Error('HTTPエラー: ' + res.status);
+      }
+      return res.json().catch(function(){
+        // JSONで返ってこなかった場合も、一応成功扱いにする
+        return { result: 'success' };
+      });
+    })
+    .then(function(data){
+      console.log('GASレスポンス:', data);
 
+      if (data.result === 'success') {
+        resultEl.textContent = '送信が完了しました。ありがとうございました。';
+        form.reset();
+      } else {
+        // GAS側からエラー返却された場合
+        resultEl.textContent = '送信に失敗しました：' + (data.message || '時間をおいて再度お試しください。');
+        console.error('GAS error:', data);
+      }
+    })
+    .catch(function(err){
+      console.error('通信エラー:', err);
+      resultEl.textContent = '送信に失敗しました（通信エラー）。時間をおいて再度お試しください。';
+    });
 
+    return false;
+  }
 
-
-
-
-
+  // コピーライト年
+  document.getElementById('copyYear').textContent = new Date().getFullYear();
+</script>
