@@ -394,6 +394,12 @@
 
  　　 <form id="contactForm" onsubmit="return handleSubmit(event)">
 
+      　　　<!-- スパムボット検出用（ユーザーには見せない） -->
+<div class="field" style="display:none;">
+  <label>この項目には何も入力しないでください</label>
+  <input type="text" name="hp" autocomplete="off" />
+</div>
+
             <!-- お名前 -->
             <div class="field">
               <label for="name">お名前</label>
@@ -523,3 +529,4 @@
   // コピーライト年
   document.getElementById('copyYear').textContent = new Date().getFullYear();
 </script>
+
