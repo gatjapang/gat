@@ -391,11 +391,8 @@
       </div>
       <div class="two">
         <div>
-          <form
-  id="contactForm"
-  action="https://script.google.com/macros/s/AKfycbyrF_JEIkSljv4kj-3kAMHdNcO59_2iVj_eFRmepVJyBwrVcGnsWDiF5hxrorSWpDdNDA/exec"
-  method="POST"
->
+
+ 　　 <form id="contactForm" onsubmit="return handleSubmit(event)">
 
             <!-- お名前 -->
             <div class="field">
@@ -478,57 +475,51 @@
   });
 
 
-  // ★ここにGASのWebアプリURLを貼る（最新デプロイのURL）/*
+  // ★GAS WebアプリのURL（最新の /exec をそのまま）
   const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyrF_JEIkSljv4kj-3kAMHdNcO59_2iVj_eFRmepVJyBwrVcGnsWDiF5hxrorSWpDdNDA/exec';
 
-// フォーム送信（GASにFormDataをPOST）
-function handleSubmit(e){
-  e.preventDefault();
+  // フォーム送信（GASにFormDataをPOST）
+  function handleSubmit(e){
+    e.preventDefault();
 
-  const form = e.currentTarget;
-  const fd   = new FormData(form);
+    const form = e.currentTarget;
+    const fd   = new FormData(form);
 
-  // userAgent も一緒に送る
-  fd.append('userAgent', navigator.userAgent);
+    // userAgent も一緒に送る（シートでは使っても使わなくてもOK）
+    fd.append('userAgent', navigator.userAgent);
 
-  // 必須項目チェック（表示用）
-  if (!fd.get('name') || !fd.get('email') || !fd.get('message')) {
-    alert('未入力の項目があります');
+    // 必須項目チェック（表示用）
+    if (!fd.get('name') || !fd.get('email') || !fd.get('message')) {
+      alert('未入力の項目があります');
+      return false;
+    }
+
+    const resultEl = document.getElementById('formResult');
+    resultEl.style.display = 'block';
+    resultEl.textContent = '送信中です…';
+
+    // デバッグ用ログ（名前とメールだけ）
+    console.log('送信データ(名前・メール):', fd.get('name'), fd.get('email'));
+
+    fetch(GAS_ENDPOINT, {
+      method: 'POST',
+      mode: 'no-cors',   // CORSエラーを回避
+      body: fd           // FormDataをそのまま送信
+    })
+    .then(function(){
+      // no-cors なのでレスポンスは読めないが、
+      // ここまで来れば「送信までは成功した」とみなす
+      resultEl.textContent = '送信が完了しました。ありがとうございました。';
+      form.reset();
+    })
+    .catch(function(err){
+      console.error('通信エラー:', err);
+      resultEl.textContent = '送信に失敗しました。通信環境をご確認のうえ、時間をおいて再度お試しください。';
+    });
+
     return false;
   }
 
-  const resultEl = document.getElementById('formResult');
-  resultEl.style.display = 'block';
-  resultEl.textContent = '送信中です…';
-
-  // デバッグ用ログ（名前とメールだけにしておく）
-  console.log('送信データ(名前・メール):', fd.get('name'), fd.get('email'));
-
-  fetch(GAS_ENDPOINT, {
-    method: 'POST',
-    mode: 'no-cors',   // ← これがポイント（CORSエラーを回避）
-    body: fd           // ← FormDataをそのまま送る（ヘッダーは自動で付く）
-  })
-  .then(function(){
-    // no-cors なのでレスポンスの中身は読めないが、
-    // ここまで来れば「リクエスト送信自体」は成功したとみなせる
-    resultEl.textContent = '送信が完了しました。ありがとうございました。';
-    form.reset();
-  })
-  .catch(function(err){
-    console.error('通信エラー:', err);
-    resultEl.textContent = '送信に失敗しました。通信環境をご確認のうえ、時間をおいて再度お試しください。';
-  });
-
-  return false;
-}
-*/
   // コピーライト年
   document.getElementById('copyYear').textContent = new Date().getFullYear();
 </script>
-
-
-
-
-
-
