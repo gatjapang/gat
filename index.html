@@ -438,53 +438,80 @@
       <div class="sec-h">
         <div class="eyebrow">CONTACT</div>
         <h2>お問合せ</h2>
-        <p class="lead">ご相談・ご質問は下記フォームよりお気軽にお送りください。</p>
+        <p class="lead">ご相談・ご質問は下記よりお気軽にお送りください。</p>
       </div>
       <div class="two">
         <div>
 
- 　　 <form id="contactForm" onsubmit="return handleSubmit(event)">
+<form id="contactForm" onsubmit="return handleSubmit(event)">
 
+  <!-- お問い合わせ区分 -->
+  <div class="field">
+    <label for="topic">お問い合わせ区分</label>
+    <select id="topic" name="topic">
+      <option>サービスについて</option>
+      <option>Zoom Phoneについて</option>
+      <option>お見積り</option>
+      <option>採用について</option>
+      <option>その他</option>
+    </select>
+  </div>
 
-            <!-- お名前 -->
-            <div class="field">
-              <label for="name">お名前</label>
-              <input id="name" name="name" type="text" autocomplete="name" required />
-            </div>
-            <!-- メール -->
-            <div class="field">
-              <label for="email">メールアドレス</label>
-              <input id="email" name="email" type="email" autocomplete="email" required />
-            </div>
-            <!-- 区分 -->
-            <div class="field">
-              <label for="topic">お問い合わせ区分</label>
-              <select id="topic" name="topic">
-                <option>サービスについて</option>
-                <option>Zoom Phoneについて</option>
-                <option>お見積り</option>
-                <option>採用について</option>
-                <option>その他</option>
-              </select>
-            </div>
-            <!-- 本文 -->
-            <div class="field">
-              <label for="msg">内容</label>
-              <textarea id="msg" name="message" rows="6" placeholder="ご記入ください" required></textarea>
-            </div>
+  <!-- 内容 -->
+  <div class="field">
+    <label for="msg">内容</label>
+    <textarea
+      id="msg"
+      name="message"
+      rows="6"
+      placeholder="ご記入ください"
+      required
+    ></textarea>
+  </div>
 
-      　　　<!-- スパムボット検出用（ユーザーには見せない） -->
-<div class="field" style="display:none;">
-  <label>この項目には何も入力しないでください</label>
-  <input type="text" name="hp" autocomplete="off" />
-</div>
-      
-            <div class="actions">
-              <button class="btn primary" type="submit">送信する</button>
-              <button class="btn ghost" type="reset">クリア</button>
-            </div>
-            <p id="formResult" class="lead" aria-live="polite" style="display:none"></p>
-          </form>
+  <!-- メールアドレス -->
+  <div class="field">
+    <label for="email">メールアドレス</label>
+    <input
+      id="email"
+      name="email"
+      type="email"
+      autocomplete="email"
+      required
+    />
+  </div>
+
+  <!-- お名前 -->
+  <div class="field">
+    <label for="name">お名前</label>
+    <input
+      id="name"
+      name="name"
+      type="text"
+      autocomplete="name"
+      required
+    />
+  </div>
+
+  <!-- スパムボット検出用 -->
+  <div class="field" style="display:none;">
+    <label>この項目には何も入力しないでください</label>
+    <input type="text" name="hp" autocomplete="off" />
+  </div>
+
+  <div class="actions">
+    <button class="btn primary" type="submit">送信する</button>
+    <button class="btn ghost" type="reset">クリア</button>
+  </div>
+
+  <p
+    id="formResult"
+    class="lead"
+    aria-live="polite"
+    style="display:none"
+  ></p>
+
+</form>
         </div>
         
       </div>
